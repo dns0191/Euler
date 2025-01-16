@@ -11,7 +11,7 @@ int main() {
     double TIME = 0.0;
     double nextSaveTime = 0.0;
     double nextProgressTime = 10.0;
-    double DATA[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    double DATA[6] = { 0.0 };
     loadSimulationData("Input.inp");
     loadHistoryData("history.inp");
 
