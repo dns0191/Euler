@@ -15,9 +15,9 @@ int main() {
     loadSimulationData("Input.inp");
     loadHistoryData("history.inp");
 
-    std::ofstream outputFile("output_data.txt");
+    std::ofstream outputFile("output.out");
     if (!outputFile.is_open()) {
-        std::cerr << "Unable to open file for writing: output_data.txt" << std::endl;
+        std::cerr << "Unable to open file for writing: output.out" << std::endl;
         return 1;
     }
 
