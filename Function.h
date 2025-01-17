@@ -24,11 +24,11 @@ void update_reactor_state(double time, double* data) {
         DELAY += pair.second * LAMBDA[pair.first];
     }
 
-    POWER += (PROMPT + DELAY) * T_INTERVAL;
-
     for (auto& pair : PRECURSOR) {
         pair.second += (pair.second * -LAMBDA[pair.first] + BETA[pair.first] * POWER / PGEN) * T_INTERVAL;
     }
+
+    POWER += (PROMPT + DELAY) * T_INTERVAL;
 
     data[0] = POWER;
     data[1] = std::get<2>(POSITION);
