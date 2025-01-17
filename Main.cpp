@@ -16,7 +16,7 @@ int main() {
     if (!outputFile.is_open()) {
         throw std::runtime_error("Unable to open file: output.out");
     }
-
+    std::cout << "Simulation Start" << std::endl;
     outputFile << std::left
         << std::setw(10) << "Time"
         << std::setw(15) << "Power"
@@ -27,7 +27,7 @@ int main() {
         << std::setw(15) << "InsertRho" << '\n';
 
     while (TIME <= END_TIME) {
-		std::cout << "Simulation Start" << std::endl;
+		
         update_reactor_state(TIME, DATA);
 
         if (TIME >= nextSaveTime) {
