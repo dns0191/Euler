@@ -17,14 +17,29 @@ int main() {
         throw std::runtime_error("Unable to open file: output.out");
     }
 
-    outputFile << "Time\tPower\tHist_Power\tFR_Position\tCR_Position\tRHO\tInsertRho\n";
+    outputFile << std::left
+        << std::setw(10) << "Time"
+        << std::setw(15) << "Power"
+        << std::setw(15) << "Hist_Power"
+        << std::setw(15) << "FR_Position"
+        << std::setw(15) << "CR_Position"
+        << std::setw(15) << "RHO"
+        << std::setw(15) << "InsertRho" << '\n';
 
     while (TIME <= END_TIME) {
         update_reactor_state(TIME, DATA);
 
         if (TIME >= nextSaveTime) {
-            outputFile << TIME << '\t' << DATA[0] << '\t' << DATA[1] << '\t'
-                << DATA[2] << '\t' << DATA[3] << '\t' << DATA[4] << '\t' << DATA[5] << '\n';
+            outputFile << std::fixed << std::setprecision(2)
+                << std::setw(10) << TIME
+                << std::scientific << std::setprecision(6)
+                << std::setw(15) << DATA[0]
+                << std::setw(15) << DATA[1]
+                << std::fixed << std::setprecision(4)
+                << std::setw(15) << DATA[2]
+                << std::setw(15) << DATA[3]
+                << std::setw(15) << DATA[4]
+                << std::setw(15) << DATA[5] << '\n';
             nextSaveTime += 1.0;
         }
 
