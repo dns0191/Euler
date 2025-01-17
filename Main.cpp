@@ -27,6 +27,7 @@ int main() {
         << std::setw(15) << "InsertRho" << '\n';
 
     while (TIME <= END_TIME) {
+		std::cout << "Simulation Start" << std::endl;
         update_reactor_state(TIME, DATA);
 
         if (TIME >= nextSaveTime) {
