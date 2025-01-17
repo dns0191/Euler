@@ -1,33 +1,40 @@
 #include "Variable.h"
 
+double k;
+double PGEN;
+double PROMPT;
+double DELAY;
+double PRE_INSERT_RHO;
+double frWorth;
+double crWorth;
+std::tuple<double, double, double> POSITION;
+
 void update_reactor_state(double time, double* data) {
-    if (HISTORY.empty() || time < HISTORY.begin()->first || time > HISTORY.rbegin()->first) {
-        throw std::runtime_error("Invalid time or empty HISTORY map.");
-    }
-    double PRE_INSERT_RHO = INSERT_RHO;
-    auto POSITION = getInterpolatedTuple(HISTORY, time);
+
+    PRE_INSERT_RHO = INSERT_RHO;
+    POSITION = getInterpolatedTuple(HISTORY, time);
     FR_POSITION = std::get<0>(POSITION);
     CR_POSITION = std::get<1>(POSITION);
 
-    double frWorth = findWorth(FR, FR_POSITION);
-    double crWorth = findWorth(CR, CR_POSITION);
+    frWorth = findWorth(FR, FR_POSITION);
+    crWorth = findWorth(CR, CR_POSITION);
     INSERT_RHO = (frWorth + crWorth) * 1e-5;
 
     RHO += INSERT_RHO - PRE_INSERT_RHO;
 
-    double k = 1 / (1 - RHO);
-    double PGEN = PN_LIFE / k;
-    double PROMPT = (RHO - BETA_EFF) * POWER / PGEN;
-    double DELAY = 0.0;
+    k = 1 / (1 - RHO);
+    PGEN = PN_LIFE / k;
+    PROMPT = (RHO - BETA_EFF) * POWER / PGEN;
+    DELAY = 0.0;
 
-    for (const auto& pair : PRECURSOR) {
+    for (auto& pair : PRECURSOR) {
         DELAY += pair.second * LAMBDA[pair.first];
     }
 
     for (auto& pair : PRECURSOR) {
         pair.second += (pair.second * -LAMBDA[pair.first] + BETA[pair.first] * POWER / PGEN) * T_INTERVAL;
     }
-
+    
     POWER += (PROMPT + DELAY) * T_INTERVAL;
 
     data[0] = POWER;

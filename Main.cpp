@@ -40,10 +40,25 @@ int main() {
                 << std::setw(15) << DATA[3]
                 << std::setw(15) << DATA[4]
                 << std::setw(15) << DATA[5] << '\n';
-            nextSaveTime += 1.0;
+            //nextSaveTime += 1.0;
         }
 
         TIME += T_INTERVAL;
+    }
+
+    // 마지막 데이터 출력
+    if (TIME > nextSaveTime) {
+        update_reactor_state(TIME, DATA);
+        outputFile << std::fixed << std::setprecision(2)
+            << std::setw(10) << TIME
+            << std::scientific << std::setprecision(6)
+            << std::setw(15) << DATA[0]
+            << std::setw(15) << DATA[1]
+            << std::fixed << std::setprecision(4)
+            << std::setw(15) << DATA[2]
+            << std::setw(15) << DATA[3]
+            << std::setw(15) << DATA[4]
+            << std::setw(15) << DATA[5] << '\n';
     }
 
     auto end = std::chrono::high_resolution_clock::now();
