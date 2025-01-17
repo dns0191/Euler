@@ -144,7 +144,7 @@ void loadSimulationData(const std::string& filename) {
         if (key == "rho") {
             iss >> RHO;
         }
-        else if (key == "Power") {
+        else if (key == "power") {
             iss >> POWER;
         }
         else if (key == "i_rod(FR)") {
