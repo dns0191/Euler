@@ -24,8 +24,7 @@ void update_reactor_state(double time, double* data) {
         DELAY += pair.second * LAMBDA[pair.first];
     }
 
-    double deltaPOWER = PROMPT + DELAY;
-    POWER += deltaPOWER * T_INTERVAL;
+    POWER += (PROMPT + DELAY) * T_INTERVAL;
 
     for (auto& pair : PRECURSOR) {
         pair.second += (pair.second * -LAMBDA[pair.first] + BETA[pair.first] * POWER / PGEN) * T_INTERVAL;
