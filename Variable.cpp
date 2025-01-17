@@ -105,7 +105,14 @@ void loadSimulationData(const std::string& filename) {
             }
         }
     }
+
+    // 초기 PRECURSOR 계산
+    for (int i = 1; i <= 6; i++) {
+        PRECURSOR[i] = BETA[i] * POWER / (LAMBDA[i] * PN_LIFE);
+    }
+
 	INSERT_RHO = (findWorth(FR, FR_POSITION) + findWorth(CR, CR_POSITION)) * 1e-5;
+
     // Ensure FR and CR maps are populated
     if (FR.empty()) throw std::runtime_error("FR data not loaded from Input.inp.");
     if (CR.empty()) throw std::runtime_error("CR data not loaded from Input.inp.");
