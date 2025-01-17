@@ -1,61 +1,65 @@
 #include "Variable.h"
 
 void update_reactor_state(double time, double* data) {
-	double PRE_INSERT_RHO = 0.0;
-	double k = 0.0;
-	double PGEN = 0.0;
-	double DELAY = 0.0;
-	double PROMPT = 0.0;
-	double deltaPOWER = 0.0;
-	double deltaRHO = 0.0;
-	std::map<int, double> deltaPRECURSOR;
+    double PRE_INSERT_RHO = INSERT_RHO;
 
-	// 이전 반응도 저장
-	PRE_INSERT_RHO = INSERT_RHO;
+    // Check if time is within the range of HISTORY
+    if (HISTORY.empty()) {
+        throw std::runtime_error("HISTORY map is empty. Cannot proceed with update.");
+    }
+    if (time < HISTORY.begin()->first || time > HISTORY.rbegin()->first) {
+        throw std::runtime_error("Time value is outside the range of HISTORY map.");
+    }
 
-	// 제어봉 위치 업데이트
-	std::tuple<double, double> POSITION = findRodPosition(time);
-	FR_POSITION = std::get<0>(POSITION);
-	CR_POSITION = std::get<1>(POSITION);
+    // Dynamically calculate rod positions
+    std::tuple<double, double, double> POSITION = getInterpolatedTuple(HISTORY, time);
+    FR_POSITION = std::get<0>(POSITION);
+    CR_POSITION = std::get<1>(POSITION);
 
-	// 현재 반응도 계산
-	calculateInsertRho(time);
-	deltaRHO = INSERT_RHO - PRE_INSERT_RHO;
-	RHO += deltaRHO;
+    // Dynamically calculate `INSERT_RHO`
+    double frWorth = getInterpolatedValue(CR, FR_POSITION);
+    double crWorth = getInterpolatedValue(FR, CR_POSITION);
+    INSERT_RHO = (frWorth + crWorth) * 1e-5;
 
-	k = 1 / (1 - RHO);
-	PGEN = PN_LIFE / k;
+    // Update RHO and power
+    double deltaRHO = INSERT_RHO - PRE_INSERT_RHO;
+    RHO += deltaRHO;
 
-	// 출력 변화율 계산
-	for (const auto& pair : PRECURSOR) {
-		DELAY += pair.second * LAMBDA[pair.first];
-	}
-	PROMPT = (RHO - BETA_EFF) * POWER / PGEN;
-	deltaPOWER = PROMPT + DELAY;
+    double k = 1 / (1 - RHO);
+    double PGEN = PN_LIFE / k;
+    double DELAY = 0.0, PROMPT = 0.0, deltaPOWER = 0.0;
 
-	// 지발중성자군 변화율 계산
-	for (const auto& pair : PRECURSOR) {
-		deltaPRECURSOR[pair.first] = pair.second * -LAMBDA[pair.first] + BETA[pair.first] * POWER / PGEN;
-	}
+    for (const auto& pair : PRECURSOR) {
+        DELAY += pair.second * LAMBDA[pair.first];
+    }
+    PROMPT = (RHO - BETA_EFF) * POWER / PGEN;
+    deltaPOWER = PROMPT + DELAY;
 
-	// 변화량 적용
-	POWER += deltaPOWER * T_INTERVAL;
-	for (auto& pair : PRECURSOR) {
-		pair.second += deltaPRECURSOR[pair.first] * T_INTERVAL;
-	}
+    // Update precursor groups
+    std::map<int, double> deltaPRECURSOR;
+    for (const auto& pair : PRECURSOR) {
+        deltaPRECURSOR[pair.first] = pair.second * -LAMBDA[pair.first] + BETA[pair.first] * POWER / PGEN;
+    }
 
-	auto it = INTERPOLATED_HISTORY.lower_bound(time);
-    if (it != INTERPOLATED_HISTORY.begin() && (it == INTERPOLATED_HISTORY.end() || it->first != time)) {
+    // Apply changes
+    POWER += deltaPOWER * T_INTERVAL;
+    for (auto& pair : PRECURSOR) {
+        pair.second += deltaPRECURSOR[pair.first] * T_INTERVAL;
+    }
+
+    // Update data array
+    data[0] = POWER;
+    data[2] = FR_POSITION;
+    data[3] = CR_POSITION;
+    data[4] = RHO * 1e5;
+    data[5] = INSERT_RHO * 1e5;
+
+    // Dynamically fetch historical power
+    auto it = HISTORY.lower_bound(time);
+    if (it != HISTORY.begin() && (it == HISTORY.end() || it->first != time)) {
         --it;
     }
-    if (it != INTERPOLATED_HISTORY.end()) {
+    if (it != HISTORY.end()) {
         data[1] = std::get<2>(it->second);
-    } 
-
-	// DATA 배열 업데이트
-	data[0] = POWER;
-	data[2] = FR_POSITION;
-	data[3] = CR_POSITION;
-	data[4] = RHO*1e5;
-	data[5] = INSERT_RHO*1e5;
+    }
 }

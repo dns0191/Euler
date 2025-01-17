@@ -32,71 +32,29 @@ std::map<double, double> INTERPOLATED_CR;
 std::map<double, double> INTERPOLATED_FR;
 std::map<double, std::tuple<double, double, double>> INTERPOLATED_HISTORY;
 
-static std::map<double, double> linearInterpolate(const std::map<double, double>& data, double interval) {
+// Dynamic interpolation for a single value
+double getInterpolatedValue(const std::map<double, double>& data, double key) {
+    auto lower = data.lower_bound(key);
+    if (lower == data.end()) return (--lower)->second; // Beyond upper bound
+    if (lower == data.begin()) return lower->second;   // Below lower bound
 
-    std::map<double, double> interpolatedData;
-
-    if (data.size() < 2 || interval <= 0.0) {
-        throw std::invalid_argument("Insufficient data or invalid interval for interpolation.");
-    }
-
-    auto it1 = data.begin();
-    auto it2 = std::next(it1);
-
-    while (it2 != data.end()) {
-        double startKey = it1->first;
-        double endKey = it2->first;
-        double startValue = it1->second;
-        double endValue = it2->second;
-
-        for (double key = startKey; key <= endKey; key += interval) {
-            if (key > endKey) break;
-
-            double value = startValue + (key - startKey) / (endKey - startKey) * (endValue - startValue);
-            interpolatedData[key] = value;
-        }
-        interpolatedData[endKey] = endValue;
-
-        it1++;
-        it2++;
-    }
-
-    return interpolatedData;
+    auto upper = lower--;
+    // Linear interpolation formula
+    return lower->second + (key - lower->first) / (upper->first - lower->first) * (upper->second - lower->second);
 }
 
-// std::tuple<double, double, double> 보간
-static std::map<double, std::tuple<double, double, double>> linearInterpolate(const std::map<double, std::tuple<double, double, double>>& data, double interval) {
+// Dynamic interpolation for a tuple
+std::tuple<double, double, double> getInterpolatedTuple(const std::map<double, std::tuple<double, double, double>>& data, double key) {
+    auto lower = data.lower_bound(key);
+    if (lower == data.end()) return (--lower)->second; // Beyond upper bound
+    if (lower == data.begin()) return lower->second;   // Below lower bound
 
-    std::map<double, std::tuple<double, double, double>> interpolatedData;
-
-    if (data.size() < 2 || interval <= 0.0) {
-        throw std::invalid_argument("Insufficient data or invalid interval for interpolation.");
-    }
-
-    auto it1 = data.begin();
-    auto it2 = std::next(it1);
-
-    while (it2 != data.end()) {
-        double startKey = it1->first;
-        double endKey = it2->first;
-        const auto& startValue = it1->second;
-        const auto& endValue = it2->second;
-
-        for (double key = startKey; key <= endKey; key += interval) {
-            if (key > endKey) break;
-
-            double value1 = std::get<0>(startValue) + (key - startKey) / (endKey - startKey) * (std::get<0>(endValue) - std::get<0>(startValue));
-            double value2 = std::get<1>(startValue) + (key - startKey) / (endKey - startKey) * (std::get<1>(endValue) - std::get<1>(startValue));
-            double value3 = std::get<2>(startValue) + (key - startKey) / (endKey - startKey) * (std::get<2>(endValue) - std::get<2>(startValue));
-            interpolatedData[key] = std::make_tuple(value1, value2, value3);
-        }
-        interpolatedData[endKey] = endValue;
-
-        it1++;
-        it2++;
-    }
-
-    return interpolatedData;
+    auto upper = lower--;
+    // Interpolating each component of the tuple
+    double value1 = std::get<0>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<0>(upper->second) - std::get<0>(lower->second));
+    double value2 = std::get<1>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<1>(upper->second) - std::get<1>(lower->second));
+    double value3 = std::get<2>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<2>(upper->second) - std::get<2>(lower->second));
+    return std::make_tuple(value1, value2, value3);
 }
 
 double findWorth(const std::map<double, double>& data, double position) {
@@ -209,8 +167,8 @@ void loadSimulationData(const std::string& filename) {
     }
 
     // 제어봉가 보간
-    INTERPOLATED_CR = linearInterpolate(CR, T_INTERVAL*0.01);
-    INTERPOLATED_FR = linearInterpolate(FR, T_INTERVAL*0.01);
+    INTERPOLATED_CR.clear();
+    INTERPOLATED_FR.clear();
 
     // INSERT_RHO 계산
     double frWorth = findWorth(INTERPOLATED_FR, FR_POSITION);
@@ -237,7 +195,7 @@ void loadHistoryData(const std::string& filename) {
     file.close();
 
     // 운전 기록 보간
-    INTERPOLATED_HISTORY = linearInterpolate(HISTORY, T_INTERVAL);
+    INTERPOLATED_HISTORY.clear();
 
     // HISTORY에서 마지막 Time 값을 END_TIME으로 설정
     if (!HISTORY.empty()) {
