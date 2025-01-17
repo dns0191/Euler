@@ -62,8 +62,12 @@ int main() {
     }
 
     auto end = std::chrono::high_resolution_clock::now();
-    std::cout << "Simulation completed in " << std::chrono::duration<double>(end - start).count() << " seconds.\n";
+
+	outputFile << "CPU TIME: " << std::chrono::duration<double>(end - start).count() << " seconds.\n";
+
     outputFile.close();
+
+    std::cout << "CPU TIME: " << std::chrono::duration<double>(end - start).count() << " seconds.\n";
 
     return 0;
 }
