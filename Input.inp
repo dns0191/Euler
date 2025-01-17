@@ -3,7 +3,7 @@ power 1.62592E-09
 i_rod(FR) 0.0
 i_rod(CR) 22.62
 pn_life 2.0e-4
-t_interval 1.0e-4
+t_interval 1.0e-2
 
 beta
 1	0.00026
