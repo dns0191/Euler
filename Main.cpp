@@ -40,7 +40,7 @@ int main() {
                 << std::setw(15) << DATA[3]
                 << std::setw(15) << DATA[4]
                 << std::setw(15) << DATA[5] << '\n';
-            //nextSaveTime += 1.0;
+            nextSaveTime += 1.0;
         }
 
         TIME += T_INTERVAL;

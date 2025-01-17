@@ -106,6 +106,11 @@ void loadSimulationData(const std::string& filename) {
         }
     }
 
+    BETA_EFF = 0.0;
+    for (const auto& beta : BETA) {
+        BETA_EFF += beta.second;
+    }
+
     // 초기 PRECURSOR 계산
     for (int i = 1; i <= 6; i++) {
         PRECURSOR[i] = BETA[i] * POWER / (LAMBDA[i] * PN_LIFE);
