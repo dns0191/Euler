@@ -24,6 +24,7 @@
     <ProjectGuid>{71f2a4c5-d6f0-49e6-9ccf-f4a8e7db14d8}</ProjectGuid>
     <RootNamespace>Euler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>RK4</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
