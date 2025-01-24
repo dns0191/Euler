@@ -1,3 +1,5 @@
+#ifndef FUNCTION_H
+#define FUNCTION_H
 #include "Variable.h"
 
 double k;
@@ -9,7 +11,7 @@ double frWorth;
 double crWorth;
 std::tuple<double, double, double> POSITION;
 
-void update_reactor_state(double time, double* data) {
+inline  void update_reactor_state(double time, double* data) {
 
     PRE_INSERT_RHO = INSERT_RHO;
     POSITION = getInterpolatedTuple(HISTORY, time);
@@ -44,3 +46,5 @@ void update_reactor_state(double time, double* data) {
     data[4] = RHO * 1e5;
     data[5] = INSERT_RHO * 1e5;
 }
+
+#endif
