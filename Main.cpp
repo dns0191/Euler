@@ -8,7 +8,7 @@
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    double TIME = 0.0, nextSaveTime = 0.0, DATA[6] = { 0.0 };
+    double TIME = 0.0, nextSaveTime = 0.0, countTime = 0.0, DATA[6] = { 0.0 };
     loadSimulationData("Input.inp");
     loadHistoryData("history.inp");
 
@@ -16,7 +16,7 @@ int main() {
     if (!outputFile.is_open()) {
         throw std::runtime_error("Unable to open file: output.out");
     }
-    std::cout << "Simulation Start" << std::endl;
+    std::cout << "Simulation Start" << "\n";
     outputFile << std::left
         << std::setw(10) << "Time"
         << std::setw(15) << "Power"
@@ -43,7 +43,10 @@ int main() {
                 << std::setw(15) << DATA[5] << '\n';
             nextSaveTime += 1.0;
         }
-
+		if (TIME >= countTime) {
+			std::cout << "Progress: " << int(TIME) << " sec" << "\n";
+			countTime += 10.0;
+		}
         TIME += T_INTERVAL;
     }
 
