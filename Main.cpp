@@ -12,6 +12,8 @@ int main() {
     loadSimulationData("Input.inp");
     loadHistoryData("history.inp");
 
+	std::cout << "Simulation Data Loaded" << std::endl;
+    initialize_debug_files();
     std::ofstream outputFile("output.out");
     if (!outputFile.is_open()) {
         throw std::runtime_error("Unable to open file: output.out");
