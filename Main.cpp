@@ -6,7 +6,7 @@
 #include "Function.h"
 
 int main() {
-    auto start = std::chrono::high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
 
     double TIME = 0.0, nextSaveTime = 0.0, countTime = 0.0, DATA[6] = { 0.0 };
     loadSimulationData("Input.inp");
@@ -65,7 +65,7 @@ int main() {
             << std::setw(15) << DATA[5] << '\n';
     }
 
-    auto end = std::chrono::high_resolution_clock::now();
+    const auto end = std::chrono::high_resolution_clock::now();
 
 	outputFile << "CPU TIME: " << std::chrono::duration<double>(end - start).count() << " seconds.\n";
 
