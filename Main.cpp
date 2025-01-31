@@ -44,7 +44,7 @@ int main() {
             nextSaveTime += 1.0;
         }
 		if (TIME >= countTime) {
-			std::cout << "Progress: " << int(TIME) << " sec" << "\n";
+			std::cout << "Progress: " << static_cast<int>(TIME) << " sec" << "\n";
 			countTime += 10.0;
 		}
         TIME += T_INTERVAL;

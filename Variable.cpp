@@ -17,8 +17,8 @@ double findWorth(const std::map<double, double>& data, double position) {
     if (lower == data.end()) return (--lower)->second;
     if (lower == data.begin()) return lower->second;
 
-    auto upper = lower--;
-    double denominator = upper->first - lower->first;
+    const auto upper = lower--;
+    const double denominator = upper->first - lower->first;
     if (denominator == 0.0) {
         throw std::runtime_error("Division by zero in interpolation.");
     }
@@ -32,7 +32,7 @@ std::tuple<double, double, double> getInterpolatedTuple(const std::map<double, s
     if (lower == data.end()) return (--lower)->second;
     if (lower == data.begin()) return lower->second;
 
-    auto upper = lower--;
+    const auto upper = lower--;
     double v1 = std::get<0>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<0>(upper->second) - std::get<0>(lower->second));
     double v2 = std::get<1>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<1>(upper->second) - std::get<1>(lower->second));
     double v3 = std::get<2>(lower->second) + (key - lower->first) / (upper->first - lower->first) * (std::get<2>(upper->second) - std::get<2>(lower->second));
